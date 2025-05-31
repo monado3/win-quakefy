@@ -1,5 +1,13 @@
 ﻿#Requires AutoHotkey v2.0
 #SingleInstance force
+; ListLines 0
+SendMode "Input"
+SetWorkingDir A_ScriptDir
+; KeyHistory 0
+; #WinActivateForce
+
+SetWinDelay -1
+SetControlDelay -1
 
 ; スクリプトを常駐させる
 Persistent()
