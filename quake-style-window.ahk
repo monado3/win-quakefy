@@ -1,61 +1,59 @@
 ﻿#Requires AutoHotkey v2.0
 #SingleInstance force
-; ListLines 0
+
+; Performance and responsiveness settings
+ListLines 0
 SendMode "Input"
 SetWorkingDir A_ScriptDir
-; KeyHistory 0
+KeyHistory 0
 ; #WinActivateForce
-
 SetWinDelay -1
 SetControlDelay -1
 
-; スクリプトを常駐させる
-Persistent()
-
-; ウィンドウタイトルのマッチモードを設定 (完全一致)
-SetTitleMatchMode(3)
-
-; 非表示ウィンドウも検出する設定
+Persistent() ; Keep the script running
+SetTitleMatchMode(3) ; (3 = exact match for window titles)
 DetectHiddenWindows(true)
 
-; --- 設定 ---
-Global TargetWinTitle := "Stack" ; 操作対象ウィンドウのタイトル
-Global Hotkey_Toggle := "^["  ; ホットキー
-Global IsStackWindowHidden := false ; ウィンドウが隠されているかどうかを管理する変数 (初期値: false = 表示されている可能性あり)
-Global stackWinId := "" ; ウィンドウIDを格納する変数
-Global lastActiveWinId := ""
+; --- Configuration ---
+TargetWinTitle := "Stack" ; Title of the window to operate on
+HotkeyForToggle := "^["
+
+stackWinId := ""
+lastActiveWinId := ""
+
+#Include vd_library.ahk
 
 IsInitalized() {
     Global stackWinId
     return StrCompare(stackWinId, "") != 0
 }
 
-; 対象ウィンドウの表示/非表示を切り替える関数
-ToggleStackWindow(*) {
+ToggleTargetWindow(*) {
     Global stackWinId, TargetWinTitle, lastActiveWinId
 
     if !isInitalized() || !WinExist(stackWinId) {
-        stackWinId := WinExist(TargetWinTitle) ; ウィンドウのID (HWND) を取得
+        stackWinId := WinExist(TargetWinTitle) ; Get the ID (HWND) of the target window
     }
     if !WinExist(stackWinId) {
-        MsgBox("`"" . TargetWinTitle . "`" というウィンドウが見つかりません。")
-        ; ここにアプリケーションを起動するコマンドを追加することもできます。 ; 例: Run("C:\Path\To\Your\StackApp.exe")
+        MsgBox("`"" . TargetWinTitle . "`" not found.")
+        ; Optional: Add code here to launch the application if it's not running.
+        ; Example: Run("C:\Path\To\Your\StackApp.exe")
         return
     }
 
-    ; if !isHidden && WinActive(stackWinId) {
     if WinActive(stackWinId) {
         WinHide(stackWinId)
         if (lastActiveWinId != "" && WinExist(lastActiveWinId)) {
-            WinActivate(lastActiveWinId) ; 最後にアクティブだったウィンドウをアクティブにする
+            WinActivate(lastActiveWinId)
         }
     } else {
+        MoveWindowToCurrentDesktop(stackWinId)
         lastActiveWinId := WinGetID("A")
-        WinShow(TargetWinTitle)
+        WinShow(stackWinId)
         WinActivate(stackWinId)
         WinWaitActive(stackWinId)
     }
 }
 
-; --- ホットキーとメッセージハンドラの定義 ---
-HotKey(Hotkey_Toggle, ToggleStackWindow) ; ホットキーを設定
+; --- Hotkey Definition ---
+HotKey(HotkeyForToggle, ToggleTargetWindow)

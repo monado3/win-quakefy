@@ -7,6 +7,8 @@ It's similar to WindowsTerminal functionality but you can use this to any your c
 
 ## Features
 - Global hotkey to toggle window visibility
+- Handles multi virtual desktops env
 
 ## Requirements
 - AutoHotKey v2 (working confirmed in Win11 24H2)
+- Latest VirtualDesktopAccessor.dll at the project root from [VirtualDesktopAccessor](https://github.com/Ciantic/VirtualDesktopAccessor/releases/)
