@@ -23,7 +23,6 @@ Global TargetWinTitle := "Stack" ; 操作対象ウィンドウのタイトル
 Global Hotkey_Toggle := "^["  ; ホットキー
 Global IsStackWindowHidden := false ; ウィンドウが隠されているかどうかを管理する変数 (初期値: false = 表示されている可能性あり)
 Global stackWinId := "" ; ウィンドウIDを格納する変数
-Global isHidden := false
 Global lastActiveWinId := ""
 
 IsInitalized() {
@@ -33,7 +32,7 @@ IsInitalized() {
 
 ; 対象ウィンドウの表示/非表示を切り替える関数
 ToggleStackWindow(*) {
-    Global isHidden, stackWinId, TargetWinTitle, lastActiveWinId
+    Global stackWinId, TargetWinTitle, lastActiveWinId
 
     if !isInitalized() || !WinExist(stackWinId) {
         stackWinId := WinExist(TargetWinTitle) ; ウィンドウのID (HWND) を取得
@@ -44,16 +43,15 @@ ToggleStackWindow(*) {
         return
     }
 
-    if !isHidden && WinActive(stackWinId) {
+    ; if !isHidden && WinActive(stackWinId) {
+    if WinActive(stackWinId) {
         WinHide(stackWinId)
-        isHidden := true
         if (lastActiveWinId != "" && WinExist(lastActiveWinId)) {
             WinActivate(lastActiveWinId) ; 最後にアクティブだったウィンドウをアクティブにする
         }
     } else {
         lastActiveWinId := WinGetID("A")
         WinShow(TargetWinTitle)
-        isHidden := false
         WinActivate(stackWinId)
         WinWaitActive(stackWinId)
     }
